@@ -47,27 +47,35 @@ Catalogs medical procedures with procedure codes, names, and associated costs.
 
 - **Database**: MySQL
 - **Language**: SQL
+- **Analytics Layer**: Python (Pandas, SQLAlchemy, Matplotlib, Seaborn, Jupyter)
 
 ## 📁 Project Structure
 
 ```
 hospitalManagementSQL/
-├── Hospital_Database.sql      # Database schema and data insertion scripts
-├── Hospital_Query.sql         # SQL queries for data analysis
-├── HospitalDatabaseSchema.png # Database schema visualization
-├── Hospital Management System Questions.pdf
-├── HOSPITAL MANAGEMENT SYSTEM.pdf
-└── README.md                  # Project documentation
+├── Hospital_Database.sql          # Database schema and data insertion scripts
+├── Hospital_Query.sql             # SQL queries for data analysis
+├── HospitalDatabaseSchema.png     # Database schema visualization
+├── README.md                      # Project documentation
+│
+└── python_analytics/              # ← Python analytics layer (NEW)
+    ├── Hospital_Analytics.ipynb   #   Main notebook: connect → clean → analyze → visualize
+    ├── config.py                  #   DATA_SOURCE toggle + DB credentials
+    ├── data_loader.py             #   Load tables + build merged DataFrame
+    ├── eda.py                     #   EDA, cleaning, normalization
+    ├── insights.py                #   All analytical insight functions
+    ├── visualizations.py          #   Matplotlib/Seaborn chart generation
+    ├── export_to_csv.py           #   One-time MySQL → CSV exporter
+    ├── requirements.txt           #   pip dependencies
+    ├── data/                      #   Pre-exported CSVs (offline mode)
+    └── visuals/                   #   Output PNG charts
 ```
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### SQL Layer
 
-- MySQL Server installed and running
-- MySQL Workbench or any MySQL client (optional, for GUI)
-
-### Installation
+**Prerequisites:** MySQL Server installed and running
 
 1. **Clone or download this repository**
 
@@ -82,17 +90,18 @@ hospitalManagementSQL/
    -- Run queries from Hospital_Query.sql to explore the database
    ```
 
-### Database Setup
+### 🐍 Python Analytics Layer
 
-Execute the following in your MySQL client:
+**No MySQL server required** — the notebook runs fully offline using pre-exported CSVs.
 
-```sql
--- The Hospital_Database.sql file contains:
--- 1. Database creation
--- 2. Table creation with proper relationships
--- 3. Sample data insertion
--- 4. Basic SELECT statements for verification
+```bash
+cd python_analytics
+pip install -r requirements.txt
+jupyter notebook Hospital_Analytics.ipynb
 ```
+
+For live MySQL mode, update `MYSQL_CONFIG` in `config.py` and set `DATA_SOURCE = 'mysql'` in the notebook.  
+See [`python_analytics/README.md`](python_analytics/README.md) for full setup instructions.
 
 ## 📊 Sample Queries
 
@@ -112,6 +121,38 @@ Example queries include:
 - Filtering patients by diagnosis
 - And many more...
 
+## 🐍 Python Analytics Layer
+
+The `/python_analytics` folder adds a complete data pipeline on top of the SQL database.
+
+### What It Generates
+
+| Analysis | Insight |
+|---|---|
+| Diagnosis frequency | Top diagnoses overall, by physician, by department |
+| Physician workload | Diagnoses handled + primary care patients, ranked |
+| Procedure cost analysis | Avg ₹2,628 · range ₹300–₹7,000 · distribution charts |
+| Patient demographics | Gender split (Male/Female) + street-type geographic proxy |
+| Data quality report | Null audit, duplicate detection, type validation |
+
+### Charts Produced
+
+| Chart | File |
+|---|---|
+| Top 10 Diagnoses (bar) | `visuals/top_diagnoses.png` |
+| Physician Workload (grouped bar) | `visuals/physician_workload.png` |
+| Procedure Cost Distribution (histogram + boxplot + catalog) | `visuals/procedure_cost_distribution.png` |
+| Patient Gender Split (pie + bar) | `visuals/patient_gender_distribution.png` |
+| Diagnoses by Department (bar) | `visuals/diagnoses_by_department.png` |
+
+### Documented Schema Limitations
+
+The pipeline explicitly flags what the current schema *cannot* support — a real-world data engineering practice:
+
+- ❌ **Age distribution** — No `dob` field in `Patient`
+- ❌ **Cost per patient** — No `patient_procedure` junction table
+- ❌ **Geographic distribution** — Address is free-text, no city/state field
+
 ## 📈 Database Statistics
 
 - **35 Physicians** across various specialties
@@ -119,7 +160,7 @@ Example queries include:
 - **39 Patients** with complete demographic information
 - **33 Nurses** with various positions and registration statuses
 - **20 Medical Procedures** with associated costs
-- **Multiple Diagnoses** covering a wide range of medical conditions
+- **39 Diagnoses** covering a wide range of medical conditions
 
 ## 🔗 Table Relationships
 
@@ -133,6 +174,7 @@ Example queries include:
 - The database uses foreign key constraints to maintain referential integrity
 - Sample data is provided for demonstration purposes
 - All queries are documented with comments explaining their purpose
+- The Python analytics layer is read-only — it never modifies the database
 
 ## 🤝 Contributing
 
@@ -144,4 +186,4 @@ This project is for educational purposes.
 
 ---
 
-**Note**: This project demonstrates database design principles and SQL querying techniques for hospital management systems. It can serve as a foundation for more complex healthcare management applications.
+**Note**: This project demonstrates database design principles and SQL querying techniques for hospital management systems, extended with a Python data pipeline showcasing real-world analytics patterns (ETL, EDA, visualization, schema limitation documentation).
